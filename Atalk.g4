@@ -1,16 +1,19 @@
-lexer grammar Atalk;
-
+grammar Atalk;
+ 
 program : 
-    [actordef]*
+    (actordef)*
     {System.out.println("program");}
     ;
 actordef :
-    ACTOR '<' CONST_INT '>' NEWLINE
-    [vardef | receiverdef]* END
+    ACTOR '<' CONST_INT '>' NEW_LINE
+    (gvardef | receiverdef)* END
     {System.out.println("actordef");}
     ;
+receiverdef : 
+  RECEIVER ID '(' ((TYPE ID) (',' TYPE ID)*)* ')' NEW_LINE (statement)* END {System.out.println("receiverdef");}
+  ;
 gvardef:
-    TYPE ID[','ID]*
+    TYPE ID(','ID)*
     {System.out.println("gvardef");}
     ;
 eqvardef:
@@ -22,11 +25,11 @@ inrecvardef:
     {System.out.println("invarrecdef");}
     ;
 statement:
-    ((inrecvardef | expr)'\n')*
-    {System.out.println("satetment");}
+    ((inrecvardef | expr)'\n')* '\n'
+    {System.out.println("statement");}
     ;
 expr:
-    (funcall | arithexp | ID)
+    (funcall | arithexp | ID | CONST_INT)
     {System.out.println("expr");}
     ;
 funcall:
@@ -44,6 +47,7 @@ arithexp:
       (LOGICAL_OPERATOR_NOT | '-')arithexp |
       '[' expr ']' |
       '(' expr ')' 
+    )
       {System.out.println("arithexp");}
     ; 
 
@@ -62,11 +66,8 @@ ACTOR:
 RECEIVER:
   'receiver' {System.out.println("receiver");}
   ;
-INT:
-  'int' {System.out.println("int");}
-  ;
-CHAR:
-  'char' {System.out.println("char");}
+TYPE : 
+  'int' | 'char' {System.out.println("type");}
   ;
 QUIT:
   'quit' {System.out.println("quit");}  
