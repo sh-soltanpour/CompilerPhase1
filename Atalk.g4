@@ -1,11 +1,11 @@
 grammar Atalk;
  
 program : 
-    (actordef)*
+    (actordef + ('\n')*)*
     {System.out.println("program");}
     ;
 actordef :
-    ACTOR '<' CONST_INT '>' NEW_LINE
+    ACTOR ID '<' CONST_INT '>' 
     (gvardef | receiverdef)* END
     {System.out.println("actordef");}
     ;
@@ -24,33 +24,70 @@ inrecvardef:
     (eqvardef | gvardef)(','((ID '=' expr)|ID)*)*
     {System.out.println("invarrecdef");}
     ;
+ifrule : 
+  IF expr (statement)* 
+  ((ELSEIF) (statement)*)*
+  (ELSE (statement)*)
+  END
+  {System.out.println("if rule");}
+  ;
 statement:
-    ((inrecvardef | expr)'\n')* '\n'
+    ((inrecvardef | expr | ifrule)'\n')* '\n'
     {System.out.println("statement");}
     ;
 expr:
-    (funcall | arithexp | ID | CONST_INT)
+    (funcall | termsend )
     {System.out.println("expr");}
     ;
 funcall:
     ID '('(expr(','expr)*)*')'
     {System.out.println("funcall");}
     ;
-arithexp:
-    (((ID|SENDER)SEND_OPERATOR arithexp) |
-      arithexp LOGICAL_OPERATOR_OR arithexp |
-      arithexp LOGICAL_OPERATOR_AND arithexp |
-      arithexp EQUALITY_OPERATOR arithexp |
-      arithexp RELATIONAL_OPERATOR arithexp |
-      arithexp ARITHMETIC_PM_OPERATOR arithexp |
-      arithexp ARITHMETIC_MD_OPERATOR arithexp |
-      (LOGICAL_OPERATOR_NOT | '-')arithexp |
-      '[' expr ']' |
-      '(' expr ')' 
-    )
-      {System.out.println("arithexp");}
-    ; 
 
+termsend:
+    ((ID | SENDER) SEND_OPERATOR (termassignment)) | termassignment 
+    {System.out.println("termsend");}
+    ;
+termassignment:
+    (termor ASSIGNMENT_OPERATOR termassignment ) | termor
+    {System.out.println("termassignment");}
+    ;
+termor:
+    (termand LOGICAL_OPERATOR_OR termor ) | termand
+    {System.out.println("termor");}
+    ;
+termand:
+    (termeq LOGICAL_OPERATOR_AND termand ) | termeq
+    {System.out.println("termand");}
+    ;
+termeq:
+    (termrel EQUALITY_OPERATOR termeq ) | termrel
+    {System.out.println("termeq");}
+    ;
+termrel:
+    (termpm RELATIONAL_OPERATOR termrel ) | termpm
+    {System.out.println("termrel");}
+    ;
+termpm:
+    (termmd ARITHMETIC_PM_OPERATOR termpm ) | termmd
+    {System.out.println("termpm");}
+    ;
+termmd :
+    (termunary ARITHMETIC_MD_OPERATOR termmd) | termunary
+    {System.out.println("termmd");}
+    ;
+termunary:
+    (LOGICAL_OPERATOR_NOT | '-') termunary | termbracket
+    {System.out.println("termunary");}
+    ;
+termbracket : 
+    ('[' termbracket ']') | termpar
+    {System.out.println("termbracket");}
+    ;
+termpar : 
+    ( '(' termpar ')') | ID | CONST_INT
+    {System.out.println("termpar");}
+    ;
 CONST_INT:
         [0-9]+ {System.out.println("const int");}
     ;

@@ -1,0 +1,3 @@
+actor test<2> 
+int a
+end
