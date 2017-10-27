@@ -6,15 +6,15 @@ program :
     ;
 actordef :
     ACTOR ID '<' CONST_INT '>' NEW_LINE
-    (gvardef | receiverdef)* END NEW_LINE
+    (gvardef | receiverdef | NEW_LINE)* END (NEW_LINE)?
     {System.out.println("actordef");}
     ;
 receiverdef : 
-  RECEIVER ID '(' ((TYPE ('[' expr ']')* ID) (',' TYPE ('[' expr ']')* ID)*)* ')' NEW_LINE
-   (statement)* END NEW_LINE {System.out.println("receiverdef");}
+  RECEIVER ID '(' ((TYPE ('[' expr ']')* ID) (',' TYPE ('[' expr ']')* ID)*)* ')' (NEW_LINE)?
+   (statement | NEW_LINE)* END NEW_LINE {System.out.println("receiverdef");}
   ;
 gvardef:
-    TYPE ('[' expr ']')* ID(','ID)* NEW_LINE
+    TYPE ('[' expr ']')* ID(','ID)*
     {System.out.println("gvardef");}
     ;
 eqvardef:
@@ -26,18 +26,18 @@ inrecvardef:
     {System.out.println("invarrecdef");}
     ;
 ifrule : 
-  IF expr (statement)* 
-  ((ELSEIF) (statement)*)*
-  (ELSE (statement)*)?
+  IF expr (statement | NEW_LINE)* 
+  ((ELSEIF) (statement | NEW_LINE)*)*
+  (ELSE (statement | NEW_LINE)*)?
   END
   {System.out.println("if rule");}
   ;
 foreachrule : 
-  FOREACH ID IN ID (statement)* END
+  FOREACH ID IN ID NEW_LINE (statement| NEW_LINE)* END
   {System.out.println("foreach rule");}
   ;
 scoperule :
-  'begin' (statement)* END
+  'begin' (statement | NEW_LINE)* END
   {System.out.println("scoperule");}
   ;  
 statement:
@@ -99,7 +99,7 @@ termbracket :
     {System.out.println("termbracket");}
     ;
 termpar : 
-    ( '(' termpar ')') | funcall | arraycall | STRING | ID | CONST_INT  | CHARACTER
+    ( '(' termpar ')') | funcall | arraycall | CHARACTER | STRING | ID | CONST_INT
     {System.out.println("termpar");}
     ;
 
@@ -108,7 +108,7 @@ CONST_INT:
   [0-9]+ {System.out.println("const int");}
   ;
 COMMENT:
-  '#' ~[\n]* '\n' -> skip 
+  '#' ~[\n]*  -> skip 
   ;
 SENDER :
   'sender' {System.out.println("Sender Token");}
