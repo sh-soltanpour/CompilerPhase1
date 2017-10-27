@@ -1,20 +1,20 @@
 grammar Atalk;
  
 program : 
-    (actordef + ('\n')*)*
+    (actordef | NEW_LINE)*
     {System.out.println("program");}
     ;
 actordef :
-    ACTOR ID '<' CONST_INT '>' 
-    (gvardef | receiverdef)* END
+    ACTOR ID '<' CONST_INT '>' NEW_LINE
+    (gvardef | receiverdef)* END NEW_LINE
     {System.out.println("actordef");}
     ;
 receiverdef : 
-  RECEIVER ID '(' ((TYPE ('[' expr ']')* ID) (',' TYPE ('[' expr ']')* ID)*)* ')' 
-   (statement)* END {System.out.println("receiverdef");}
+  RECEIVER ID '(' ((TYPE ('[' expr ']')* ID) (',' TYPE ('[' expr ']')* ID)*)* ')' NEW_LINE
+   (statement)* END NEW_LINE {System.out.println("receiverdef");}
   ;
 gvardef:
-    TYPE ('[' expr ']')* ID(','ID)*
+    TYPE ('[' expr ']')* ID(','ID)* NEW_LINE
     {System.out.println("gvardef");}
     ;
 eqvardef:
@@ -41,7 +41,7 @@ scoperule :
   {System.out.println("scoperule");}
   ;  
 statement:
-    ((inrecvardef | expr | ifrule | foreachrule | scoperule | 'quit' | 'break'))+
+    (inrecvardef | expr | ifrule | foreachrule | scoperule | 'quit' | 'break')NEW_LINE
     {System.out.println("statement");}
     ;
 expr:
@@ -202,9 +202,9 @@ ID:
   [a-zA-Z_][a-zA-Z0-9_]* {System.out.println("id");}
   ;
 NEW_LINE:
-  [\r\n]+ -> skip 
+  [\r\n]+ 
     ;
 
 TAB:
-  [\t]+ -> skip 
+  [\t ' ']+ -> skip 
   ;
