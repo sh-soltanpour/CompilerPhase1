@@ -1,0 +1,20 @@
+# Code #2
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: [Nothing]
+
+# Actors
+actor Adder<5>
+	# Variables
+	int addsCount
+
+	# Receivers
+	receiver init()
+		addsCount = 0
+	end
+
+	receiver add(int x, int y)
+		addsCount = addsCount + 1
+		write(x + y)
+	end
+end

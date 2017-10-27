@@ -1,0 +1,23 @@
+# Code #18
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: 241
+
+actor Program<10>
+	char var
+	receiver init()
+		char var = '1'
+		begin
+			char var = '2'
+			begin
+				char var = '3'
+			end
+			write(var) # Writes 2
+		end
+		if 1
+			char var = '4'
+			write(var) # Writes 4
+		end
+		write(var) # Writes 1
+	end
+end

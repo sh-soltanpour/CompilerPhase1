@@ -1,0 +1,7 @@
+# Code #7
+# Syntax Analysis: NOK
+# Semantic Analysis: -
+# Output: -
+
+actor ActorName<4> int var
+end

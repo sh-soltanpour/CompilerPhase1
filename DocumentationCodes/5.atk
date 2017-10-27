@@ -1,0 +1,8 @@
+# Code #5
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: [Nothing]
+
+actor ActorName<4> # Actor definition
+	# Actor variables(states) and receivers
+end

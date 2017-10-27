@@ -1,0 +1,9 @@
+# Code #9
+# Syntax Analysis: NOK
+# Semantic Analysis: -
+# Output: -
+
+actor FirstActor<4> 
+	int var
+end actor SecondActor<5>
+end

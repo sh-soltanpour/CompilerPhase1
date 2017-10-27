@@ -10,14 +10,15 @@ actordef :
     {System.out.println("actordef");}
     ;
 receiverdef : 
-  RECEIVER ID '(' ((TYPE ID) (',' TYPE ID)*)* ')' NEW_LINE (statement)* END {System.out.println("receiverdef");}
+  RECEIVER ID '(' ((TYPE ('[' expr ']')* ID) (',' TYPE ('[' expr ']')* ID)*)* ')' 
+   (statement)* END {System.out.println("receiverdef");}
   ;
 gvardef:
-    TYPE ID(','ID)*
+    TYPE ('[' expr ']')* ID(','ID)*
     {System.out.println("gvardef");}
     ;
 eqvardef:
-    TYPE ID '=' expr
+    TYPE ('[' expr ']')* ID '=' expr
     {System.out.println("eqvardef");}
     ;
 inrecvardef:
@@ -27,29 +28,42 @@ inrecvardef:
 ifrule : 
   IF expr (statement)* 
   ((ELSEIF) (statement)*)*
-  (ELSE (statement)*)
+  (ELSE (statement)*)?
   END
   {System.out.println("if rule");}
   ;
+foreachrule : 
+  FOREACH ID IN ID (statement)* END
+  {System.out.println("foreach rule");}
+  ;
+scoperule :
+  'begin' (statement)* END
+  {System.out.println("scoperule");}
+  ;  
 statement:
-    ((inrecvardef | expr | ifrule)'\n')* '\n'
+    ((inrecvardef | expr | ifrule | foreachrule | scoperule | 'quit' | 'break'))+
     {System.out.println("statement");}
     ;
 expr:
-    (funcall | termsend )
+    (funcall  | termsend   )
     {System.out.println("expr");}
     ;
 funcall:
-    ID '('(expr(','expr)*)*')'
+    ID '('( (STRING | expr )(','(STRING |expr ))*)*')'
     {System.out.println("funcall");}
     ;
-
+arraycall: 
+    ID ('[' expr ']')+ 
+    {System.out.println("arraycall");}
+    ;
 termsend:
-    ((ID | SENDER) SEND_OPERATOR (termassignment)) | termassignment 
+    ((ID | SENDER | SELF) SEND_OPERATOR (funcall)) | termassignment 
     {System.out.println("termsend");}
     ;
 termassignment:
-    (termor ASSIGNMENT_OPERATOR termassignment ) | termor
+    (termor '=' (
+    
+    termassignment)  | termor)
     {System.out.println("termassignment");}
     ;
 termor:
@@ -85,17 +99,19 @@ termbracket :
     {System.out.println("termbracket");}
     ;
 termpar : 
-    ( '(' termpar ')') | ID | CONST_INT
+    ( '(' termpar ')') | funcall | arraycall | STRING | ID | CONST_INT  | CHARACTER
     {System.out.println("termpar");}
     ;
+
+
 CONST_INT:
-        [0-9]+ {System.out.println("const int");}
-    ;
+  [0-9]+ {System.out.println("const int");}
+  ;
 COMMENT:
-    '#'()*'\n' {System.out.println("comment");}
+  '#' ~[\n]* '\n' -> skip 
   ;
 SENDER :
-    'sender' {System.out.println("Sender Token");}
+  'sender' {System.out.println("Sender Token");}
   ;
 ACTOR: 
   'actor' {System.out.println("actor");}
@@ -106,9 +122,7 @@ RECEIVER:
 TYPE : 
   'int' | 'char' {System.out.println("type");}
   ;
-QUIT:
-  'quit' {System.out.println("quit");}  
-  ;
+
 FOREACH:
   'foreach' {System.out.println("foreach");}  
   ;
@@ -136,12 +150,8 @@ BEGIN :
 IN :
   'in' {System.out.println("in");}  
   ;
-READ : 
-  'read' {System.out.println("read");}
-  ;
-WRITE:
-  'write' {System.out.println("write");}
-  ;
+
+
 SINGLE_QUOTE:
   '\'' {System.out.println("Single quote");}
   ;
@@ -152,7 +162,7 @@ CHARACTER :
   ['][a-zA-Z0-9]['] {System.out.println("character");}
   ;
 STRING:
-  ["][a-zA-Z-_0-9]*["] {System.out.println("string");}
+  ["]~["]*["] {System.out.println("string");}
   ;
 ARITHMETIC_PM_OPERATOR :
   ('+' | '-' ) {System.out.println("arithmetic pm op");}
@@ -179,12 +189,9 @@ LOGICAL_OPERATOR_NOT:
   ('not') {System.out.println("logical not op");}
   ;
 
-ASSIGNMENT_OPERATOR:
-  ('=') {System.out.println("assigment op");}
-  ;
 
 SEND_OPERATOR:
-  ('«') {System.out.println("send op");}
+  ('<<') {System.out.println("send op");}
   ;
 
 COMMA:
@@ -195,7 +202,7 @@ ID:
   [a-zA-Z_][a-zA-Z0-9_]* {System.out.println("id");}
   ;
 NEW_LINE:
-  [ \r\n]+ -> skip 
+  [\r\n]+ -> skip 
     ;
 
 TAB:

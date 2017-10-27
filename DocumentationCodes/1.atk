@@ -1,0 +1,35 @@
+# Code #1
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: 5
+
+# Actors
+actor Adder<10>
+	# Variables
+	int addsCount
+
+	# Receivers
+	receiver init()
+		addsCount = 0 + 5
+	end
+
+	receiver add(int x, int y)
+		addsCount = addsCount - 1
+		sender << addCompleted(x + y)
+
+	end
+end
+
+actor Runner<1>
+	receiver init()
+		self << run()
+	end
+
+	receiver run()
+		Adder << add(2, 3)
+	end
+
+	receiver addCompleted(int result)
+		write(result)
+	end
+end

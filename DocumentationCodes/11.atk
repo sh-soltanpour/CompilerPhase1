@@ -1,0 +1,14 @@
+# Code #11
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: [Nothing]
+
+actor Math<10>
+	receiver divide(int x, int y)
+		if y == 0
+			quit
+		else
+			sender << divisionCompleted(x / y)
+		end
+	end
+end

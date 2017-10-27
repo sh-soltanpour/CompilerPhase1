@@ -1,0 +1,18 @@
+# Code #17
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: [Nothing]
+
+actor Math<10>
+	receiver calcSumUpToZero(int[10] array)
+		int sum = 0
+		foreach element in array
+			if element <> 0
+				sum = sum + element
+			else
+				break
+			end
+		end
+		sender << calcSumUpToZeroCompleted(sum)
+	end
+end

@@ -1,0 +1,10 @@
+# Code #10
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: [Nothing]
+
+actor ActorName<4> # Actor definition
+	receiver receiverName(int arg1, char arg2) # Receiver definition
+		# Receiver body
+	end
+end

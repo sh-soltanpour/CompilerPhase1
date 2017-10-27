@@ -1,0 +1,18 @@
+# Code #19
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: Do you want to continue? ...
+
+actor Program<10>
+	receiver init()
+		char[2] data
+		write("Do you want to continue")
+		data = read(2)
+		if data == "no"
+			quit
+		else
+			write("OK :)")
+			self << init()
+		end
+	end
+end

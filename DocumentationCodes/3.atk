@@ -1,0 +1,11 @@
+# Code #3
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: [Nothing]
+
+# Comment
+actor Adder<4>
+	# Comment
+	int addsCount # Number of times add message received
+	# int commentedVariable
+end

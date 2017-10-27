@@ -1,0 +1,14 @@
+# Code #4
+# Syntax Analysis: OK
+# Semantic Analysis: OK
+# Output: [Nothing]
+
+# Comment
+actor Adder<4>
+	receiver add(int x, int y)
+		write(x + y)
+	end
+	receiver add(int x, int y, int z)
+		write(x + y + z)
+	end
+end

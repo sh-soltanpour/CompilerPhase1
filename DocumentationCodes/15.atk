@@ -1,0 +1,20 @@
+# Code #15
+# Syntax Analysis: OK
+# Semantic Analysis: NOK
+# Output: -
+
+actor A<1>
+	receiver ping()
+		write("ping received")
+		sender << invalidReceiver()
+	end
+end
+actor B<1>
+	receiver init()
+		A << ping()
+	end
+	receiver pong()
+		write("pong received")
+		sender << ping()
+	end
+end
