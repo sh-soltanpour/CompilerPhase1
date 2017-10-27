@@ -21,6 +21,10 @@ eqvardef:
     TYPE ('[' expr ']')* ID '=' expr
     {System.out.println("eqvardef");}
     ;
+arrayinit : 
+    '{' arrayinit (','arrayinit)* '}' | CONST_INT | CHARACTER | STRING
+    {System.out.println("arrayinit");}
+    ;
 inrecvardef:
     (eqvardef | gvardef)(','((ID '=' expr)|ID)*)*
     {System.out.println("invarrecdef");}
@@ -99,10 +103,14 @@ termbracket :
     {System.out.println("termbracket");}
     ;
 termpar : 
-    ( '(' termpar ')') | funcall | arraycall | CHARACTER | STRING | ID | CONST_INT
+    ( '(' termpar ')') | funcall | arraycall | CHARACTER | STRING | ID | CONST_INT | arrayinit
     {System.out.println("termpar");}
     ;
 
+
+CHARACTER :
+  '\'' [a-zA-Z0-9] '\'' {System.out.println("character");}
+  ;
 
 CONST_INT:
   [0-9]+ {System.out.println("const int");}
@@ -151,16 +159,6 @@ IN :
   'in' {System.out.println("in");}  
   ;
 
-
-SINGLE_QUOTE:
-  '\'' {System.out.println("Single quote");}
-  ;
-DOUBLE_QUOTE : 
-  '\"\"' {System.out.println("Double quote");}
-  ;
-CHARACTER :
-  ['][a-zA-Z0-9]['] {System.out.println("character");}
-  ;
 STRING:
   ["]~["]*["] {System.out.println("string");}
   ;
@@ -206,5 +204,5 @@ NEW_LINE:
     ;
 
 TAB:
-  [\t ' ']+ -> skip 
+  ('\t'| ' ')+ -> skip 
   ;
