@@ -61,7 +61,7 @@ arraycall:
     {System.out.println("arraycall");}
     ;
 termsend:
-    ((ID | SENDER | SELF) SEND_OPERATOR (funcall)) | termassignment 
+    ((ID | SENDER | SELF) '<<' (funcall)) | termassignment 
     {System.out.println("termsend");}
     ;
 termassignment:
@@ -71,31 +71,31 @@ termassignment:
     {System.out.println("termassignment");}
     ;
 termor:
-    (termand LOGICAL_OPERATOR_OR termor ) | termand
+    (termand '|' termor ) | termand
     {System.out.println("termor");}
     ;
 termand:
-    (termeq LOGICAL_OPERATOR_AND termand ) | termeq
+    (termeq '&' termand ) | termeq
     {System.out.println("termand");}
     ;
 termeq:
-    (termrel EQUALITY_OPERATOR termeq ) | termrel
+    (termrel ('<>' | '==') termeq ) | termrel
     {System.out.println("termeq");}
     ;
 termrel:
-    (termpm RELATIONAL_OPERATOR termrel ) | termpm
+    (termpm ('<' | '>') termrel ) | termpm
     {System.out.println("termrel");}
     ;
 termpm:
-    (termmd ARITHMETIC_PM_OPERATOR termpm ) | termmd
+    (termmd ('-' | '+') termpm ) | termmd
     {System.out.println("termpm");}
     ;
 termmd :
-    (termunary ARITHMETIC_MD_OPERATOR termmd) | termunary
+    (termunary ('*' | '/') termmd) | termunary
     {System.out.println("termmd");}
     ;
 termunary:
-    (LOGICAL_OPERATOR_NOT | '-') termunary | termbracket
+    ('not' | '-') termunary | termbracket
     {System.out.println("termunary");}
     ;
 termbracket : 
@@ -103,7 +103,7 @@ termbracket :
     {System.out.println("termbracket");}
     ;
 termpar : 
-    ( '(' termpar ')') | funcall | arraycall | CHARACTER | STRING | ID | CONST_INT | arrayinit
+    ( '(' expr ')') | funcall | arraycall | CHARACTER | STRING | ID | CONST_INT | arrayinit
     {System.out.println("termpar");}
     ;
 
@@ -161,35 +161,6 @@ IN :
 
 STRING:
   ["]~["]*["] {System.out.println("string");}
-  ;
-ARITHMETIC_PM_OPERATOR :
-  ('+' | '-' ) {System.out.println("arithmetic pm op");}
-  ;
-ARITHMETIC_MD_OPERATOR :
-  ('*' | '/' ) {System.out.println("arithmetic md op");}
-  ;
-RELATIONAL_OPERATOR :
-  ('<' | '>') {System.out.println("relational");}
-  ;
-EQUALITY_OPERATOR:
-  ('<>' | '==') {System.out.println("equalty op");}
-  ;
-
-LOGICAL_OPERATOR_AND :
-  ('and' ) {System.out.println("logical and op");}
-  ;
-
-LOGICAL_OPERATOR_OR :
-  ('or' ) {System.out.println("logical or op");}
-  ;
-
-LOGICAL_OPERATOR_NOT:
-  ('not') {System.out.println("logical not op");}
-  ;
-
-
-SEND_OPERATOR:
-  ('<<') {System.out.println("send op");}
   ;
 
 COMMA:
