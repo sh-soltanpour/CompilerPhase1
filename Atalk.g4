@@ -1,20 +1,21 @@
 grammar Atalk;
  
 program : 
-    (actordef | NEW_LINE)*
     {System.out.println("program");}
+    (actordef | NEW_LINE)*
+    
     ;
 actordef :
-    ACTOR ID '<' CONST_INT '>' NEW_LINE
+    ACTOR (id=ID) '<' CONST_INT '>' NEW_LINE
     (gvardef | receiverdef | NEW_LINE)* END (NEW_LINE)?
-    {System.out.println("actordef");}
+    {System.out.println("actordef: " + $id.getText());}
     ;
 receiverdef : 
-  RECEIVER ID '(' ((TYPE ('[' expr ']')* ID) (',' TYPE ('[' expr ']')* ID)*)* ')' (NEW_LINE)?
-   (statement | NEW_LINE)* END NEW_LINE {System.out.println("receiverdef");}
+  RECEIVER (id=ID) '(' ((TYPE ('[' expr ']')* ID) (',' TYPE ('[' expr ']')* ID)*)* ')' (NEW_LINE)?
+   (statement | NEW_LINE)* END NEW_LINE {System.out.println("receiverdef: " + $id.getText());}
   ;
 gvardef:
-    TYPE ('[' expr ']')* ID(','ID)*
+    TYPE ('[' expr ']')* (ID)(','ID)*
     {System.out.println("gvardef");}
     ;
 eqvardef:
@@ -22,156 +23,158 @@ eqvardef:
     {System.out.println("eqvardef");}
     ;
 arrayinit : 
-    '{' arrayinit (','arrayinit)* '}' | CONST_INT | CHARACTER | STRING
     {System.out.println("arrayinit");}
+    '{' arrayinit (','arrayinit)* '}' | CONST_INT | CHARACTER | STRING
+    
     ;
 inrecvardef:
-    (eqvardef | gvardef)(','((ID '=' expr)|ID)*)*
     {System.out.println("invarrecdef");}
+    (eqvardef | gvardef)(','((ID '=' expr)|ID)*)*
     ;
 ifrule : 
+  {System.out.println("if rule");}
   IF expr (statement | NEW_LINE)* 
   ((ELSEIF) (statement | NEW_LINE)*)*
   (ELSE (statement | NEW_LINE)*)?
   END
-  {System.out.println("if rule");}
+  
   ;
 foreachrule : 
-  FOREACH ID IN ID NEW_LINE (statement| NEW_LINE)* END
-  {System.out.println("foreach rule");}
+{System.out.println("foreach rule");}
+  FOREACH ID IN ( (ID('['CONST_INT']')*) | arrayinit | STRING) NEW_LINE (statement| NEW_LINE)* END
+  
   ;
 scoperule :
+{System.out.println("scoperule");}
   'begin' (statement | NEW_LINE)* END
-  {System.out.println("scoperule");}
   ;  
 statement:
-    (inrecvardef | expr | ifrule | foreachrule | scoperule | 'quit' | 'break')NEW_LINE
     {System.out.println("statement");}
+    (inrecvardef | expr | ifrule | foreachrule | scoperule | 'quit' | 'break')NEW_LINE
     ;
 expr:
-    (funcall  | termsend   )
     {System.out.println("expr");}
+    (funcall  | termsend   )
     ;
 funcall:
+     {System.out.println("funcall");}
     ID '('( (STRING | expr )(','(STRING |expr ))*)*')'
-    {System.out.println("funcall");}
     ;
 arraycall: 
-    ID ('[' expr ']')+ 
     {System.out.println("arraycall");}
+    ID ('[' expr ']')+ 
     ;
 termsend:
-    ((ID | SENDER | SELF) '<<' (funcall)) | termassignment 
-    {System.out.println("termsend");}
+    ((ID | SENDER | SELF) (op='<<') (funcall)) {System.out.println("termsend: " + $op.getText());}| termassignment 
+    
     ;
 termassignment:
-    (termor '=' (
-    
-    termassignment)  | termor)
-    {System.out.println("termassignment");}
+    (termor (op='=') (
+    termassignment) {System.out.println("termassignment: " + $op.getText());} | termor)
     ;
 termor:
-    (termand '|' termor ) | termand
-    {System.out.println("termor");}
+    (termand (op='or') termor ){System.out.println("termor: " + $op.getText());} | termand 
+    
     ;
 termand:
-    (termeq '&' termand ) | termeq
-    {System.out.println("termand");}
+    (termeq (op='and') termand ) {System.out.println("termand: " + $op.getText());} | termeq
+    
     ;
 termeq:
-    (termrel ('<>' | '==') termeq ) | termrel
-    {System.out.println("termeq");}
+    (termrel (op=('<>' | '==')) termeq ) {System.out.println("termeq: " + $op.getText());}| termrel
+    
     ;
 termrel:
-    (termpm ('<' | '>') termrel ) | termpm
-    {System.out.println("termrel");}
+    (termpm (op=('<' | '>')) termrel ) {System.out.println("termrel: " + $op.getText());}| termpm
+    
     ;
 termpm:
-    (termmd ('-' | '+') termpm ) | termmd
-    {System.out.println("termpm");}
+    (termmd (op=('-' | '+')) termpm ) {System.out.println("termpm: " + $op.getText());}| termmd
+    
     ;
 termmd :
-    (termunary ('*' | '/') termmd) | termunary
-    {System.out.println("termmd");}
+    (termunary (op=('*' | '/')) termmd) {System.out.println("termmd" + $op.getText());} | termunary
+    
     ;
 termunary:
-    ('not' | '-') termunary | termbracket
-    {System.out.println("termunary");}
+    (op=('not' | '-')) termunary   {System.out.println("termunary" + $op.getText());}| termbracket
+   
     ;
 termbracket : 
-    ('[' termbracket ']') | termpar
     {System.out.println("termbracket");}
+    ('[' termbracket ']') | termpar
+    
     ;
 termpar : 
-    ( '(' expr ')') | funcall | arraycall | CHARACTER | STRING | ID | CONST_INT | arrayinit
     {System.out.println("termpar");}
+    ( '(' expr ')') | funcall | arraycall | CHARACTER | STRING | ID | CONST_INT | arrayinit
     ;
 
 
 CHARACTER :
-  '\'' [a-zA-Z0-9] '\'' {System.out.println("character");}
+  {System.out.println("character");} '\'' [a-zA-Z0-9] '\'' 
   ;
 
 CONST_INT:
-  [0-9]+ {System.out.println("const int");}
+  {System.out.println("const int");} [0-9]+ 
   ;
 COMMENT:
   '#' ~[\n]*  -> skip 
   ;
 SENDER :
-  'sender' {System.out.println("Sender Token");}
+  {System.out.println("Sender Token");} 'sender' 
   ;
 ACTOR: 
-  'actor' {System.out.println("actor");}
+  {System.out.println("actor");} 'actor' 
   ;
 RECEIVER:
-  'receiver' {System.out.println("receiver");}
+  {System.out.println("receiver");} 'receiver' 
   ;
 TYPE : 
-  'int' | 'char' {System.out.println("type");}
+  {System.out.println("type");} 'int' | 'char' 
   ;
 
 FOREACH:
-  'foreach' {System.out.println("foreach");}  
+  {System.out.println("foreach");} 'foreach' 
   ;
 BREAK:
-  'break' {System.out.println("break");}  
+ {System.out.println("break");}  'break' 
   ;
 IF:
-  'if'  {System.out.println("if");}  
+  {System.out.println("if");}  'if'  
   ;
 ELSEIF:
-  'elseif' {System.out.println("elseif");}  
+  {System.out.println("elseif");}  'elseif' 
   ;
 ELSE:
-  'else' {System.out.println("else");}  
+  {System.out.println("else");} 'else'   
   ;
 SELF:
-  'self' {System.out.println("self");}  
+  {System.out.println("self");}  'self' 
   ;
 END :
-  'end' {System.out.println("end");}  
+  {System.out.println("end");} 'end'  
   ;
 BEGIN :
-  'begin' {System.out.println("begin");}  
+  {System.out.println("begin");}  'begin' 
   ;
 IN :
-  'in' {System.out.println("in");}  
+  {System.out.println("in");} 'in'   
   ;
 
 STRING:
-  ["]~["]*["] {System.out.println("string");}
+  {System.out.println("string");} ["]~["]*["] 
   ;
 
 COMMA:
-  (',') {System.out.println("comma");} 
+  {System.out.println("comma");} (',') 
   ;
 
 ID:
-  [a-zA-Z_][a-zA-Z0-9_]* {System.out.println("id");}
+  {System.out.println("id");} [a-zA-Z_][a-zA-Z0-9_]* 
   ;
 NEW_LINE:
-  [\r\n]+ 
+  {System.out.println("new line");}[\r\n]+ 
     ;
 
 TAB:
